@@ -1,28 +1,25 @@
 import thunk from 'redux-thunk'
+import { routerReducer, routerMiddleware } from 'redux-json-router'
+import { combineReducers, createStore, applyMiddleware, compose } from 'redux'
 import { createLogger } from 'redux-logger'
-import { createStore, applyMiddleware } from 'redux';
-import rootReducer from './reducers/RootReducer'
-
-let auth_token = JSON.parse(localStorage.getItem('todo_auth_token'))
+import createHistory from 'history/createBrowserHistory'
+import { todoIdReducer } from './reducers/todoIdReducer'
+import { authReducer } from './reducers/authReducer'
 
 const loggerMiddleware = createLogger()
 
-const buildStore = {
-  auth: {
-    authError: false,
-    authErrorMessage: '',
-    apiKey: auth_token,
-    loading: false,
-  }
+const makeRootReducer = () => combineReducers({
+  todoId: todoIdReducer,
+  auth: authReducer,
+  router: routerReducer,
+})
+
+function configureStore(history, initialState = {}) {
+
+  const middlewares = [loggerMiddleware, thunk, routerMiddleware(history)]
+
+  const enhancers = [applyMiddleware(...middlewares)]
+
+  return createStore(makeRootReducer(), initialState, enhancers)
+
 }
-
-const store = createStore(
-  rootReducer,
-  buildStore,
-  applyMiddleware(
-    thunk,
-    loggerMiddleware
-  )
-)
-
-export default store;
