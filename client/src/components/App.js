@@ -1,21 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import Link from 'redux-first-router-link'
+import Main from './Main'
+import Auth from './Auth'
 
-const App = ({ todoId, onClick }) =>
+const App = ({ loggedIn, location, message, activeTodo, todos }) =>
   <div>
-    {!todoId
-      ? <div>
-          <h1>HOME</h1>
-
-          <Link href='/app/todos/123'>Todo 123</Link>
-          <Link href={{ type: 'TODO', payload: { id: 456 } }}>User 456</Link>
-        </div>
-      : <h1>{todoId}</h1>
+    { !loggedIn
+        ? <Auth location={location}/>
+        : <Main todos = {todos} todoId = {activeTodo} />
     }
   </div>
 
-const mapStateToProps = ({ todoId }) => ({ todoId })
+const mapStateToProps = (state, ownProps) => ({
+  loggedIn: state.app.auth.loggedIn,
+  message: state.app.auth.message,
+  location: state.location.type,
+  activeTodo: state.app.todos.active,
+  todos: state.app.todos.all
+})
+
 const mapDispatchToProps = (dispatch) => ({
 
 })
